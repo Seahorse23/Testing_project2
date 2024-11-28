@@ -7,7 +7,7 @@ def browser():
         browser = playwright.chromium.launch(
             headless=False,
             slow_mo=1000
-        )  # Set headless=False to see the browser actions
+        ) 
         yield browser
         browser.close()
 
@@ -24,26 +24,26 @@ def test_sportka_jackpot(page):
     refuse_btn.click()
 
     cookie_bar = page.locator("body > div:nth-child(30) > div")
-    assert cookie_bar.is_visible() == False
+    assert cookie_bar.is_visible() == False #checks the cookie bar is not visible
 
     sportka = page.locator("[alt='Sportka - obrázek']")
     sportka.click()
 
     title = page.title()
-    assert "Sportka" in title
+    assert "Sportka" in title #checks that the loaded page is correct 
 
     jackpot = page.locator(
         "body > main > div.lottery-header.sportka > div > div.bs-row\
         > div > div.wrapper > div:nth-child(1) > h1 > strong")
     raw_amount = jackpot.inner_text()
-    cl_amount = raw_amount.replace("\u00a0", "")
-    cl_amount = cl_amount.replace("Kč", "")
+    cl_amount = raw_amount.replace("\u00a0", "") #removes spaces 
+    cl_amount = cl_amount.replace("Kč", "") #removes currency
     amount = int(cl_amount)
-    assert amount > 30000000
+    assert amount > 30000000 #minimum guaranteed amount 
 
 #test_case_002
 def test_check_apps(page):
-    app_list = ["Sazka Online", "Sazka Hry", "Sazkabet", "Sazka Klub"]
+    app_list = ["Sazka Online", "Sazka Hry", "Sazkabet", "Sazka Klub"] #list of all apps
     query = "Mobilni aplikace"
     page.goto("https://www.sazka.cz/")
     refuse_btn = page.locator(".consent-bar__actions button.consent-bar__more")
@@ -57,7 +57,7 @@ def test_check_apps(page):
 
     page.fill("#quick-search-input", query)
     autocomplete = page.locator("#quick-search-autocomplete")
-    autocomplete.wait_for(state="visible", timeout=5000)
+    autocomplete.wait_for(state="visible", timeout=5000) #waits for dropdown menu to load 
     assert autocomplete
     autocomplete.click()
 
@@ -65,10 +65,10 @@ def test_check_apps(page):
     headings = heading_list.all()
 
     for item in headings:
-        assert item.inner_text() in app_list
+        assert item.inner_text() in app_list #checks all app names are present on the page 
     
     content_list = page.locator(".application-item__content")
-    content = content_list.all()
+    content = content_list.all() #checks that each app contains a google play link
 
     for item in content:
         gp_img = item.locator("[alt='Google Play']")
@@ -78,7 +78,7 @@ def test_check_apps(page):
 @pytest.mark.parametrize("col_1_p, col_1_s, col_2_p, col_2_s, extra_6", [
     ((2, 4, 15, 27, 40), (5, 11), (18, 34, 37, 40, 47), (1, 6), 303635),
     ((2, 9, 11, 16, 22), (2, 6), (1, 2, 10, 15, 36), (1, 12), 997031),
-    ((21, 22, 37, 38, 49), (2, 7), (12, 28, 29, 32, 50), (1, 7), 191206)
+    ((21, 22, 37, 38, 49), (2, 7), (12, 28, 29, 32, 50), (1, 7), 191206) 
 ])
 def test_ticket_check_EJ(page, col_1_p, col_1_s, col_2_p, col_2_s, extra_6):
     page.goto("https://www.sazka.cz/")
@@ -103,10 +103,9 @@ def test_ticket_check_EJ(page, col_1_p, col_1_s, col_2_p, col_2_s, extra_6):
     primary_number_list = column_1.locator("[data-test='number-primary']")
     secondary_number_list = column_1.locator("[data-test='number-secondary']")
     for item in col_1_p:
-        primary_number_list.get_by_text(str(item), exact=True).click()
+        primary_number_list.get_by_text(str(item), exact=True).click() #finds the specific number wanted 
     for item in col_1_s:
-        secondary_number_list.get_by_text(str(item), exact=True).click()
-    
+        secondary_number_list.get_by_text(str(item), exact=True).click() 
     assert submit_button.is_disabled() == False
 
     column_2 = page.locator("[data-columnindex='2']")
@@ -120,7 +119,7 @@ def test_ticket_check_EJ(page, col_1_p, col_1_s, col_2_p, col_2_s, extra_6):
     extra_6_button = page.locator("#addonField") 
     extra_6_button.fill(str(extra_6))
     new_class = extra_6_button.get_attribute("class")
-    assert new_class == "form-control sance-correct"
+    assert new_class == "form-control sance-correct" #checks that the Extra 6 is in correct format
 
     submit_button.click()
 
@@ -149,11 +148,11 @@ def test_check_scratch_card_rules(page):
         scr.first.click()
 
         game_plan = page.locator("div.ticket-content__grid-after-images > div:nth-child(2) a")
-        assert game_plan.is_visible() == True
+        assert game_plan.is_visible() == True #checks the game plan button is present 
         game_plan.click()
         
         url = page.url
-        assert emission in url
+        assert emission in url #checks that the url contains the scratch card emission 
         page.go_back()
         page.go_back()
 
